@@ -69,13 +69,6 @@ class SlackStatusPush(StatusReceiverMultiService):
             title_base_url = self.master_status.getTitleURL()
             build_url = build_url.replace(local_base_url, title_base_url)
 
-        source_stamps = build.getSourceStamps()
-        branch_names = ', '.join([source_stamp.branch for source_stamp in source_stamps])
-        repositories = ', '.join([source_stamp.repository for source_stamp in source_stamps])
-        responsible_users = ', '.join(build.getResponsibleUsers())
-        revision = ', '.join([source_stamp.revision for source_stamp in source_stamps])
-        project = ', '.join([source_stamp.project for source_stamp in source_stamps])
-
         if result == SUCCESS:
             status = "Success"
             color = "good"
@@ -83,12 +76,28 @@ class SlackStatusPush(StatusReceiverMultiService):
             status = "Failure"
             color = "failure"
 
-        message = "New Build for {project} ({revision})\nStatus: *{status}*\nBuild details: {url}".format(
-            project=project,
-            revision=revision,
-            status=status,
-            url=build_url
-        )
+        source_stamps = build.getSourceStamps()
+        try:
+            branch_names = ', '.join([source_stamp.branch for source_stamp in source_stamps])
+            repositories = ', '.join([source_stamp.repository for source_stamp in source_stamps])
+            responsible_users = ', '.join(build.getResponsibleUsers())
+            revision = ', '.join([source_stamp.revision for source_stamp in source_stamps])
+            project = ', '.join([source_stamp.project for source_stamp in source_stamps])
+            message = "New Build for {project} ({revision})\nStatus: *{status}*\nBuild details: {url}".format(
+                project=project,
+                revision=revision,
+                status=status,
+                url=build_url
+            )
+        except TypeError:
+            responsible_users = None
+            repositories = None
+            branch_names = None
+            message = "New Build for {builder_name}\nStatus: *{status}*\nBuild details: {url}".format(
+                builder_name=builder_name,
+                status=status,
+                url=build_url
+            )
 
         fields = []
         if responsible_users:
