@@ -11,16 +11,15 @@ class SlackStatusPush(StatusReceiverMultiService):
     """
 
     def __init__(self, weburl,
-                 localhost_replace=False, username=None,
+                 localhost_replace=True, username=None,
                  icon=None, notify_on_success=True, notify_on_failure=True,
                  **kwargs):
         """
         Creates a SlackStatusPush status service.
 
         :param weburl: Your Slack weburl
-        :param localhost_replace: If your Buildbot web fronted doesn't know
-            its public address it will use "localhost" in its links. You can
-            change this by setting this variable to true.
+        :param localhost_replace: If True, use the Buildbot TitleURL rather
+            than 'localhost' in its links.
         :param username: The user name of the "user" positing the messages on
             Slack.
         :param icon: The icon of the "user" posting the messages on Slack.
@@ -33,7 +32,7 @@ class SlackStatusPush(StatusReceiverMultiService):
         StatusReceiverMultiService.__init__(self)
 
         self.weburl = weburl
-        self.localhost_replace = localhost_replace
+        self.localhost_replace = True if localhost_replace else False
         self.username = username
         self.icon = icon
         self.notify_on_success = notify_on_success
@@ -66,15 +65,9 @@ class SlackStatusPush(StatusReceiverMultiService):
 
         build_url = self.master_status.getURLForThing(build)
         if self.localhost_replace:
-            build_url = build_url.replace("//localhost", "//{}".format(
-                self.localhost_replace))
-
-        source_stamps = build.getSourceStamps()
-        branch_names = ', '.join([source_stamp.branch for source_stamp in source_stamps])
-        repositories = ', '.join([source_stamp.repository for source_stamp in source_stamps])
-        responsible_users = ', '.join(build.getResponsibleUsers())
-        revision = ', '.join([source_stamp.revision for source_stamp in source_stamps])
-        project = ', '.join([source_stamp.project for source_stamp in source_stamps])
+            local_base_url = self.master_status.getBuildbotURL()
+            title_base_url = self.master_status.getTitleURL()
+            build_url = build_url.replace(local_base_url, title_base_url)
 
         if result == SUCCESS:
             status = "Success"
@@ -83,12 +76,28 @@ class SlackStatusPush(StatusReceiverMultiService):
             status = "Failure"
             color = "failure"
 
-        message = "New Build for {project} ({revision})\nStatus: *{status}*\nBuild details: {url}".format(
-            project=project,
-            revision=revision,
-            status=status,
-            url=build_url
-        )
+        source_stamps = build.getSourceStamps()
+        try:
+            branch_names = ', '.join([source_stamp.branch for source_stamp in source_stamps])
+            repositories = ', '.join([source_stamp.repository for source_stamp in source_stamps])
+            responsible_users = ', '.join(build.getResponsibleUsers())
+            revision = ', '.join([source_stamp.revision for source_stamp in source_stamps])
+            project = ', '.join([source_stamp.project for source_stamp in source_stamps])
+            message = "New Build for {project} ({revision})\nStatus: *{status}*\nBuild details: {url}".format(
+                project=project,
+                revision=revision,
+                status=status,
+                url=build_url
+            )
+        except TypeError:
+            responsible_users = None
+            repositories = None
+            branch_names = None
+            message = "New Build for {builder_name}\nStatus: *{status}*\nBuild details: {url}".format(
+                builder_name=builder_name,
+                status=status,
+                url=build_url
+            )
 
         fields = []
         if responsible_users:

@@ -43,7 +43,7 @@ c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL"))
 
 ```
 import slack
-c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL", "http://ci.mindmatters.de", "mindmatters Builder", None, None, False, True)
+c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL", True, "mindmatters Builder", None, None, False, True)
 ```
 
 Enjoy!
