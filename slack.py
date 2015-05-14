@@ -12,7 +12,7 @@ class SlackStatusPush(StatusReceiverMultiService):
 
     def __init__(self, weburl,
                  localhost_replace=False, username=None,
-                 icon=None, notify_on_success=True, notify_on_failure=True,
+                 icons=None, notify_on_success=True, notify_on_failure=True,
                  **kwargs):
         """
         Creates a SlackStatusPush status service.
@@ -23,7 +23,7 @@ class SlackStatusPush(StatusReceiverMultiService):
             change this by setting this variable to true.
         :param username: The user name of the "user" positing the messages on
             Slack.
-        :param icon: The icon of the "user" posting the messages on Slack.
+        :param icons: tuple str (succ, fail) emoji names or icon urls
         :param notify_on_success: Set this to False if you don't want
             messages when a build was successful.
         :param notify_on_failure: Set this to False if you don't want
@@ -35,7 +35,7 @@ class SlackStatusPush(StatusReceiverMultiService):
         self.weburl = weburl
         self.localhost_replace = localhost_replace
         self.username = username
-        self.icon = icon
+        self.icons = icons
         self.notify_on_success = notify_on_success
         self.notify_on_failure = notify_on_failure
         self.watched = []
@@ -127,10 +127,8 @@ class SlackStatusPush(StatusReceiverMultiService):
         if self.username:
             payload['username'] = self.username
 
-        if self.icon:
-            if self.icon.startswith(':'):
-                payload['icon_emoji'] = self.icon
-            else:
-                payload['icon_url'] = self.icon
+        if self.icons:
+            icon = self.icons[0 if result == SUCCESS else 1]
+            payload['icon_emoji' if icon.startswith(':') else 'icon_url'] = icon
 
         requests.post(self.weburl, data=json.dumps(payload))
