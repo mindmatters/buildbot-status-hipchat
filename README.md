@@ -32,18 +32,26 @@ c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL"))
 ### Additional Options:
 ```
   localhost_replace = False
-  builder_name = False
   username = None
-  icon = None
+  icons = None
   notify_on_success = True
   notify_on_failure = True
+  builders = None
 ```
 
 ### Complete Example:
 
 ```
 import slack
-c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL", "http://ci.mindmatters.de", "mindmatters Builder", None, None, False, True)
+slack_status = slack.SlackStatusPush(
+    "YOUR_SLACK_WEBURL",
+    localhost_replace="http://ci.mindmatters.de",
+    username="mindmatters Buildbot",
+    icons=(':full_moon_with_face:', ':umbrella:'),
+    notify_on_success=False,
+    notify_on_failure=True,
+)
+c['status'].append(slack_status)
 ```
 
 Enjoy!
