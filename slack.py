@@ -28,6 +28,8 @@ class SlackStatusPush(StatusReceiverMultiService):
             messages when a build was successful.
         :param notify_on_failure: Set this to False if you don't want
             messages when a build failed.
+        :param builders: List of builder names to filter on. The default value
+            of None will result in notifications for every builder.
         """
 
         StatusReceiverMultiService.__init__(self)
