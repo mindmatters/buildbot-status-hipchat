@@ -1,5 +1,5 @@
 from buildbot.status.base import StatusReceiverMultiService
-from buildbot.status.builder import Results, SUCCESS
+from buildbot.status.builder import SUCCESS
 import requests
 import json
 
@@ -11,8 +11,8 @@ class SlackStatusPush(StatusReceiverMultiService):
     """
 
     def __init__(self, weburl,
-                 localhost_replace=False, username=None,
-                 icons=None, notify_on_success=True, notify_on_failure=True,
+                 localhost_replace=False, username=None, icons=None,
+                 builders=None, notify_on_success=True, notify_on_failure=True,
                  **kwargs):
         """
         Creates a SlackStatusPush status service.
@@ -36,6 +36,7 @@ class SlackStatusPush(StatusReceiverMultiService):
         self.localhost_replace = localhost_replace
         self.username = username
         self.icons = icons
+        self.builders = builders
         self.notify_on_success = notify_on_success
         self.notify_on_failure = notify_on_failure
         self.watched = []
@@ -62,6 +63,9 @@ class SlackStatusPush(StatusReceiverMultiService):
             return
 
         if not self.notify_on_failure and result != SUCCESS:
+            return
+
+        if self.builders and builder_name not in self.builders:
             return
 
         build_url = self.master_status.getURLForThing(build)
