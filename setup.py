@@ -12,5 +12,6 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[
         "buildbot >= 0.8.0",
+        "requests >= 2.7.0",
     ],
 )
