@@ -32,11 +32,11 @@ c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL"))
 ### Additional Options:
 ```
   localhost_replace = False
-  builder_name = False
   username = None
   icon = None
   notify_on_success = True
   notify_on_failure = True
+  include_builder_name = False
 ```
 
 ### Complete Example:
