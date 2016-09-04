@@ -13,6 +13,7 @@ class SlackStatusPush(StatusReceiverMultiService):
     def __init__(self, weburl,
                  localhost_replace=False, username=None,
                  icon=None, notify_on_success=True, notify_on_failure=True,
+                 include_builder_name=False,
                  **kwargs):
         """
         Creates a SlackStatusPush status service.
@@ -28,6 +29,7 @@ class SlackStatusPush(StatusReceiverMultiService):
             messages when a build was successful.
         :param notify_on_failure: Set this to False if you don't want
             messages when a build failed.
+        :param include_builder_name: Add name of builder into output.
         """
 
         StatusReceiverMultiService.__init__(self)
@@ -38,6 +40,7 @@ class SlackStatusPush(StatusReceiverMultiService):
         self.icon = icon
         self.notify_on_success = notify_on_success
         self.notify_on_failure = notify_on_failure
+        self.include_builder_name = include_builder_name
         self.watched = []
 
     def setServiceParent(self, parent):
@@ -91,6 +94,12 @@ class SlackStatusPush(StatusReceiverMultiService):
         )
 
         fields = []
+        if self.include_builder_name:
+            fields.append({
+                "title": "Builder",
+                "value": builder_name
+            })
+
         if responsible_users:
             fields.append({
                 "title": "Commiters",

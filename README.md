@@ -10,7 +10,7 @@ This plugin is based on the buildbot-status-hipchat plugin created by the dev te
 ### via pip
 
 ```
-pip install -e git+https://github.com/mindmatters/buildbot-status-slack#egg=slack
+pip install -e git+https://github.com/RussianBruteForce/buildbot-status-slack#egg=slack
 ```
 
 ### manual
@@ -32,11 +32,11 @@ c['status'].append(slack.SlackStatusPush("YOUR_SLACK_WEBURL"))
 ### Additional Options:
 ```
   localhost_replace = False
-  builder_name = False
   username = None
   icon = None
   notify_on_success = True
   notify_on_failure = True
+  include_builder_name = False
 ```
 
 ### Complete Example:
